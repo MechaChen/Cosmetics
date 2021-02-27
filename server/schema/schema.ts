@@ -5,6 +5,7 @@ import {
     GraphQLInt,
     GraphQLSchema,
 } from 'graphql'
+import Product from '../models/product'
 
 // dummy data
 const products = [
@@ -50,6 +51,26 @@ const Query = new GraphQLObjectType({
     },
 })
 
+const Mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        addProduct: {
+            type: ProductType,
+            args: {
+                name: { type: GraphQLString },
+                type: { type: GraphQLString },
+                rating: { type: GraphQLInt },
+                brand: { type: GraphQLString },
+            },
+            resolve(parent, args) {
+                const product = new Product({ ...args })
+                return product.save()
+            },
+        },
+    },
+})
+
 export default new GraphQLSchema({
     query: Query,
+    mutation: Mutation,
 })
