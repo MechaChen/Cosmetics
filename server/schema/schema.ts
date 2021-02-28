@@ -8,16 +8,26 @@ import {
     GraphQLNonNull,
 } from 'graphql'
 import Product from '../models/product'
+import Brand from '../models/brand'
 
 const ProductType = new GraphQLObjectType({
     name: 'Product',
-    fields: {
+    fields: () => ({
         id: { type: GraphQLID },
         name: { type: GraphQLString },
         type: { type: GraphQLString },
         rating: { type: GraphQLInt },
-        brand: { type: GraphQLString },
-    },
+    }),
+})
+
+const BrandType = new GraphQLObjectType({
+    name: 'Brand',
+    fields: () => ({
+        id: { type: GraphQLID },
+        name: { type: GraphQLString },
+        country: { type: GraphQLString },
+        founders: { type: new GraphQLList(GraphQLString) },
+    }),
 })
 
 const Query = new GraphQLObjectType({
@@ -38,6 +48,19 @@ const Query = new GraphQLObjectType({
                 return Product.findById(args.id)
             },
         },
+        brands: {
+            type: new GraphQLList(BrandType),
+            resolve(parent, args) {
+                return Brand.find({})
+            },
+        },
+        brand: {
+            type: BrandType,
+            args: { id: { type: GraphQLID } },
+            resolve(parent, args) {
+                return Brand.findById(args.id)
+            },
+        },
     },
 })
 
@@ -50,10 +73,24 @@ const Mutation = new GraphQLObjectType({
                 name: { type: new GraphQLNonNull(GraphQLString) },
                 type: { type: new GraphQLNonNull(GraphQLString) },
                 rating: { type: new GraphQLNonNull(GraphQLInt) },
-                brand: { type: new GraphQLNonNull(GraphQLString) },
+                brandId: { type: new GraphQLNonNull(GraphQLID) },
             },
             resolve(parent, args) {
                 const product = new Product({ ...args })
+                return product.save()
+            },
+        },
+        addBrand: {
+            type: BrandType,
+            args: {
+                name: { type: new GraphQLNonNull(GraphQLString) },
+                country: { type: new GraphQLNonNull(GraphQLString) },
+                founders: {
+                    type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
+                },
+            },
+            resolve(parent, args) {
+                const product = new Brand({ ...args })
                 return product.save()
             },
         },

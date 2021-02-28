@@ -4,7 +4,7 @@ const productSchema = new Schema({
     name: String,
     type: String,
     rating: Number,
-    brand: String,
+    brandId: String,
 })
 
 export default model('Product', productSchema)
