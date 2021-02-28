@@ -17,6 +17,12 @@ const ProductType = new GraphQLObjectType({
         name: { type: GraphQLString },
         type: { type: GraphQLString },
         rating: { type: GraphQLInt },
+        brand: {
+            type: BrandType,
+            resolve(parent, args) {
+                return Brand.findById(parent.brandId)
+            },
+        },
     }),
 })
 
@@ -27,6 +33,12 @@ const BrandType = new GraphQLObjectType({
         name: { type: GraphQLString },
         country: { type: GraphQLString },
         founders: { type: new GraphQLList(GraphQLString) },
+        products: {
+            type: ProductType,
+            resolve(parent, args) {
+                return Product.find({ brandId: parent.id })
+            },
+        },
     }),
 })
 
